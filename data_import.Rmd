@@ -1,0 +1,15 @@
+---
+title: "data_import"
+author: "Yuying Lu"
+date: "2024-09-17"
+output: github_document
+---
+
+```{r setup, echo = FALSE, message = FALSE}
+library(tidyverse)
+```
+
+This document will show how to import data.
+
+
+
