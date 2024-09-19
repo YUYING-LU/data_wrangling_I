@@ -159,3 +159,60 @@ arrange(litters_df, gd_of_birth, gd0_weight)
 
 ## PIPING!!!!!!!!!!!!!!!
 
+```{r message= FALSE}
+litters_df = read_csv("data/FAS_litters.csv", na = c("NA", "", "."))
+
+litters_df = janitor::clean_names(litters_df)
+
+litters_df_var = select(litters_df, -pups_born_alive)
+
+litters_df_filter = filter(litters_df, group == 'Con7')
+
+litters_df_mutate = mutate(litters_df, wt_gain = gd18_weight - gd0_weight)
+
+```
+
+Definitely don't do this!!!
+
+```{r}
+select(janitor::clean_names(read_csv("data/FAS_litters.csv", na = c("NA", "", "."))),-pups_born_alive)
+```
+
+DO THIS:
+
+```{r}
+litters_df = 
+  read_csv("data/FAS_litters.csv", na = c("NA", "", ".")) |>
+  janitor::clean_names() |>
+  select(-pups_born_alive) |>
+  filter(group == "Con7") |> 
+  mutate(wt_gain = gd18_weight - gd0_weight, 
+         group = str_to_upper(group))
+litters_df 
+```
+
+Pip with the thing
+
+```{r}
+read_csv("data/FAS_litters.csv", na = c("NA", "", ".")) |>
+  janitor::clean_names() |>
+  mutate(wt_gain = gd18_weight - gd0_weight) |> 
+  lm(wt_gain ~ pups_born_alive, data = _)
+
+```
+
+Data export
+
+```{r}
+litters_df = 
+  read_csv("data/FAS_litters.csv", na = c("NA", "", ".")) |>
+  janitor::clean_names() |>
+  select(-pups_born_alive) |>
+  filter(group == "Con7") |> 
+  mutate(wt_gain = gd18_weight - gd0_weight, 
+         group = str_to_upper(group))
+litters_df 
+
+write_csv(litters_df, "data/cleaned_fas_litters.csv")
+```
+

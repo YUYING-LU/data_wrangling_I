@@ -628,3 +628,151 @@ arrange(litters_df, gd_of_birth, gd0_weight)
     ## # ℹ 2 more variables: pups_dead_birth <dbl>, pups_survive <dbl>
 
 ## PIPING!!!!!!!!!!!!!!!
+
+``` r
+litters_df = read_csv("data/FAS_litters.csv", na = c("NA", "", "."))
+
+litters_df = janitor::clean_names(litters_df)
+
+litters_df_var = select(litters_df, -pups_born_alive)
+
+litters_df_filter = filter(litters_df, group == 'Con7')
+
+litters_df_mutate = mutate(litters_df, wt_gain = gd18_weight - gd0_weight)
+```
+
+Definitely don’t do this!!!
+
+``` r
+select(janitor::clean_names(read_csv("data/FAS_litters.csv", na = c("NA", "", "."))),-pups_born_alive)
+```
+
+    ## Rows: 49 Columns: 8
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (2): Group, Litter Number
+    ## dbl (6): GD0 weight, GD18 weight, GD of Birth, Pups born alive, Pups dead @ ...
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+    ## # A tibble: 49 × 7
+    ##    group litter_number   gd0_weight gd18_weight gd_of_birth pups_dead_birth
+    ##    <chr> <chr>                <dbl>       <dbl>       <dbl>           <dbl>
+    ##  1 Con7  #85                   19.7        34.7          20               4
+    ##  2 Con7  #1/2/95/2             27          42            19               0
+    ##  3 Con7  #5/5/3/83/3-3         26          41.4          19               0
+    ##  4 Con7  #5/4/2/95/2           28.5        44.1          19               1
+    ##  5 Con7  #4/2/95/3-3           NA          NA            20               0
+    ##  6 Con7  #2/2/95/3-2           NA          NA            20               0
+    ##  7 Con7  #1/5/3/83/3-3/2       NA          NA            20               0
+    ##  8 Con8  #3/83/3-3             NA          NA            20               1
+    ##  9 Con8  #2/95/3               NA          NA            20               0
+    ## 10 Con8  #3/5/2/2/95           28.5        NA            20               0
+    ## # ℹ 39 more rows
+    ## # ℹ 1 more variable: pups_survive <dbl>
+
+DO THIS:
+
+``` r
+litters_df = 
+  read_csv("data/FAS_litters.csv", na = c("NA", "", ".")) |>
+  janitor::clean_names() |>
+  select(-pups_born_alive) |>
+  filter(group == "Con7") |> 
+  mutate(wt_gain = gd18_weight - gd0_weight, 
+         group = str_to_upper(group))
+```
+
+    ## Rows: 49 Columns: 8
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (2): Group, Litter Number
+    ## dbl (6): GD0 weight, GD18 weight, GD of Birth, Pups born alive, Pups dead @ ...
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+litters_df 
+```
+
+    ## # A tibble: 7 × 8
+    ##   group litter_number   gd0_weight gd18_weight gd_of_birth pups_dead_birth
+    ##   <chr> <chr>                <dbl>       <dbl>       <dbl>           <dbl>
+    ## 1 CON7  #85                   19.7        34.7          20               4
+    ## 2 CON7  #1/2/95/2             27          42            19               0
+    ## 3 CON7  #5/5/3/83/3-3         26          41.4          19               0
+    ## 4 CON7  #5/4/2/95/2           28.5        44.1          19               1
+    ## 5 CON7  #4/2/95/3-3           NA          NA            20               0
+    ## 6 CON7  #2/2/95/3-2           NA          NA            20               0
+    ## 7 CON7  #1/5/3/83/3-3/2       NA          NA            20               0
+    ## # ℹ 2 more variables: pups_survive <dbl>, wt_gain <dbl>
+
+Pip with the thing
+
+``` r
+read_csv("data/FAS_litters.csv", na = c("NA", "", ".")) |>
+  janitor::clean_names() |>
+  mutate(wt_gain = gd18_weight - gd0_weight) |> 
+  lm(wt_gain ~ pups_born_alive, data = _)
+```
+
+    ## Rows: 49 Columns: 8
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (2): Group, Litter Number
+    ## dbl (6): GD0 weight, GD18 weight, GD of Birth, Pups born alive, Pups dead @ ...
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+    ## 
+    ## Call:
+    ## lm(formula = wt_gain ~ pups_born_alive, data = mutate(janitor::clean_names(read_csv("data/FAS_litters.csv", 
+    ##     na = c("NA", "", "."))), wt_gain = gd18_weight - gd0_weight))
+    ## 
+    ## Coefficients:
+    ##     (Intercept)  pups_born_alive  
+    ##         13.0833           0.6051
+
+Data export
+
+``` r
+litters_df = 
+  read_csv("data/FAS_litters.csv", na = c("NA", "", ".")) |>
+  janitor::clean_names() |>
+  select(-pups_born_alive) |>
+  filter(group == "Con7") |> 
+  mutate(wt_gain = gd18_weight - gd0_weight, 
+         group = str_to_upper(group))
+```
+
+    ## Rows: 49 Columns: 8
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (2): Group, Litter Number
+    ## dbl (6): GD0 weight, GD18 weight, GD of Birth, Pups born alive, Pups dead @ ...
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+litters_df 
+```
+
+    ## # A tibble: 7 × 8
+    ##   group litter_number   gd0_weight gd18_weight gd_of_birth pups_dead_birth
+    ##   <chr> <chr>                <dbl>       <dbl>       <dbl>           <dbl>
+    ## 1 CON7  #85                   19.7        34.7          20               4
+    ## 2 CON7  #1/2/95/2             27          42            19               0
+    ## 3 CON7  #5/5/3/83/3-3         26          41.4          19               0
+    ## 4 CON7  #5/4/2/95/2           28.5        44.1          19               1
+    ## 5 CON7  #4/2/95/3-3           NA          NA            20               0
+    ## 6 CON7  #2/2/95/3-2           NA          NA            20               0
+    ## 7 CON7  #1/5/3/83/3-3/2       NA          NA            20               0
+    ## # ℹ 2 more variables: pups_survive <dbl>, wt_gain <dbl>
+
+``` r
+write_csv(litters_df, "data/cleaned_fas_litters.csv")
+```
